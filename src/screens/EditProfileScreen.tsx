@@ -8,6 +8,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
 import Header from '../components/Header';
+import ProfileImagePicker from '../components/ProfileImagePicker';
+import { imageService } from '../services/imageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type EditProfileScreenProps = {
@@ -21,7 +23,28 @@ const EditProfileScreen: React.FC = () => {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [specialty, setSpecialty] = useState(user?.specialty || '');
+  const [profileImage, setProfileImage] = useState(user?.image || '');
   const [loading, setLoading] = useState(false);
+
+  const handleImageSelected = async (imageUri: string) => {
+    try {
+      setProfileImage(imageUri);
+      
+      // Salva a imagem no armazenamento local se for uma nova imagem
+      if (imageUri.startsWith('data:image/') && user?.id) {
+        const savedImageUri = await imageService.saveProfileImage(user.id, {
+          uri: imageUri,
+          base64: imageUri.split(',')[1],
+          width: 150,
+          height: 150,
+        });
+        setProfileImage(savedImageUri);
+      }
+    } catch (error) {
+      console.error('Erro ao processar imagem:', error);
+      Alert.alert('Erro', 'Não foi possível processar a imagem selecionada');
+    }
+  };
 
   const handleSaveProfile = async () => {
     try {
@@ -36,6 +59,7 @@ const EditProfileScreen: React.FC = () => {
         ...user!,
         name: name.trim(),
         email: email.trim(),
+        image: profileImage,
         ...(user?.role === 'doctor' && { specialty: specialty.trim() }),
       };
 
@@ -44,6 +68,11 @@ const EditProfileScreen: React.FC = () => {
 
       // Salva no AsyncStorage
       await AsyncStorage.setItem('@MedicalApp:user', JSON.stringify(updatedUser));
+
+      // Limpeza de imagens antigas
+      if (user?.id) {
+        await imageService.cleanupOldImages(user.id);
+      }
 
       Alert.alert('Sucesso', 'Perfil atualizado com sucesso!', [
         { text: 'OK', onPress: () => navigation.goBack() }
@@ -64,7 +93,12 @@ const EditProfileScreen: React.FC = () => {
         <Title>Editar Perfil</Title>
 
         <ProfileCard>
-          <Avatar source={{ uri: user?.image || 'https://via.placeholder.com/150' }} />
+          <ProfileImagePicker
+            currentImageUri={profileImage}
+            onImageSelected={handleImageSelected}
+            size={120}
+            editable={true}
+          />
           
           <Input
             label="Nome"
@@ -162,12 +196,7 @@ const ProfileCard = styled.View`
   border-color: ${theme.colors.border};
 `;
 
-const Avatar = styled.Image`
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  margin-bottom: 16px;
-`;
+// Avatar removido - agora usamos o ProfileImagePicker
 
 const RoleBadge = styled.View<{ role: string }>`
   background-color: ${(props: { role: string }) => {

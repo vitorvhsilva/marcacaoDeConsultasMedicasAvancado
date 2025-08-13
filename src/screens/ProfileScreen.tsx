@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
 import Header from '../components/Header';
+import ProfileImagePicker from '../components/ProfileImagePicker';
 import { ViewStyle } from 'react-native';
 
 type ProfileScreenProps = {
@@ -37,7 +38,12 @@ const ProfileScreen: React.FC = () => {
         <Title>Meu Perfil</Title>
 
         <ProfileCard>
-          <Avatar source={{ uri: user?.image || 'https://via.placeholder.com/150' }} />
+          <ProfileImagePicker
+            currentImageUri={user?.image}
+            onImageSelected={() => {}} // Read-only na tela de perfil
+            size={120}
+            editable={false}
+          />
           <Name>{user?.name}</Name>
           <Email>{user?.email}</Email>
           <RoleBadge role={user?.role || ''}>
@@ -55,6 +61,7 @@ const ProfileScreen: React.FC = () => {
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.editButton}
         />
+
         <Button
           title="Voltar"
           onPress={() => navigation.goBack()}
@@ -85,12 +92,12 @@ const styles = {
     backgroundColor: theme.colors.primary,
     paddingVertical: 12,
   },
-  logoutButton: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 12,
-  },
   editButton: {
     backgroundColor: theme.colors.success,
+    paddingVertical: 12,
+  },
+  logoutButton: {
+    backgroundColor: theme.colors.error,
     paddingVertical: 12,
   },
 };
@@ -122,12 +129,7 @@ const ProfileCard = styled.View`
   border-color: ${theme.colors.border};
 `;
 
-const Avatar = styled.Image`
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  margin-bottom: 16px;
-`;
+// Avatar removido - agora usamos o ProfileImagePicker
 
 const Name = styled.Text`
   font-size: 20px;
