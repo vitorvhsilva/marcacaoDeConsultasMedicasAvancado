@@ -77,7 +77,7 @@ const DoctorDashboardScreen: React.FC = () => {
         );
         setAppointments(doctorAppointments);
 
-        if (user) {
+        if (user?.id) {
           const stats = await statisticsService.getDoctorStatistics(user.id);
           setStatistics(stats);
         }
@@ -172,29 +172,35 @@ const handleOpenModal = (appointment: Appointment, action: 'confirm' | 'cancel')
           <StatisticsGrid>
             <StatisticsCard
               title="Total de Consultas"
-              value={statistics.totalAppointments}
+              value={statistics.totalAppointments ?? 0}
               color={theme.colors.primary}
               subtitle="Todas as consultas"
             />
             <StatisticsCard
               title="Consultas Confirmadas"
-              value={statistics.confirmedAppointments}
+              value={statistics.confirmedAppointments ?? 0}
               color={theme.colors.success}
-              subtitle={`${statistics.statusPercentages.confirmed.toFixed(1)}% do total`}
+                subtitle={`${(statistics.statusPercentages?.confirmed ?? 0).toFixed(1)}% do total`}
             />
             <StatisticsCard
               title="Consultas Canceladas"
-              value={statistics.cancelledAppointments}
+              value={statistics.cancelledAppointments ?? 0}
               color={theme.colors.error}
-              subtitle={`${statistics.statusPercentages.confirmed.toFixed(1)}% do total`}
+              subtitle={`${(statistics.statusPercentages?.pending ?? 0).toFixed(1)}% do total`}
+            />
+            <StatisticsCard
+              title="Pacientes Atendidos"
+              value={statistics.totalPatients ?? 0}
+              color={theme.colors.secondary}
+              subtitle="Pacientes únicos"
             />
           </StatisticsGrid>
         )}
 
         <SectionTitle>Especialidades Mais Procuradas</SectionTitle>
-        {statistics && Object.entries(statistics.specialties).length > 0 && (
+        {statistics && Object.entries(statistics.specialties ?? 0).length > 0 && (
           <SpecialtyContainer>
-            {Object.entries(statistics.specialties)
+            {Object.entries(statistics.specialties ?? 0)
               .sort(([,a], [,b]) => b - a)
               .slice(0, 3)
               .map(([specialty, count]) => (
