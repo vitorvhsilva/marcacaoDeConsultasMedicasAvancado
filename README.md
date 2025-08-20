@@ -73,25 +73,6 @@ npm run ios
 yarn ios
 ```
 
-## Estrutura do Projeto
-
-```
-src/
-├── components/     # Componentes reutilizáveis
-│   ├── Header/    # Componente de cabeçalho
-│   └── AppointmentForm/  # Formulário de agendamento
-├── screens/        # Telas do aplicativo
-│   ├── HomeScreen.tsx
-│   └── CreateAppointmentScreen.tsx
-├── styles/         # Estilos globais e tema
-│   └── theme.ts
-├── types/          # Definições de tipos TypeScript
-│   ├── appointments.ts
-│   ├── doctors.ts
-│   └── navigation.ts
-└── utils/          # Funções utilitárias
-```
-
 ## Funcionalidades Detalhadas
 
 ### Agendamento de Consultas
