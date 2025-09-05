@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appointment } from '../models/appointments';
 import { User } from '../models/user';
-import { statisticsService, Statistics } from '../services/statisticsService';
+import { statisticsService, Statistics } from '../../../services/statistics';
 
 export const useAdminDashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
